@@ -56,6 +56,30 @@ struct ContentView: View {
         
     }
     
+    private func updateTask(_ task: Task) {
+        task.isFavourite = !task.isFavourite
+        
+        do {
+            try viewContext.save()
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    private func styleForPriority(_ value: String) -> Color {
+        let priority  = Priority(rawValue: value)
+        switch priority {
+        case .low:
+            return Color.green
+        case .medium:
+            return Color.orange
+        case .high:
+            return Color.red
+        case .none:
+            return Color.blue
+        }
+    }
+    
     var body: some View {
         NavigationView {
             VStack{
@@ -79,7 +103,17 @@ struct ContentView: View {
                 List {
                     ForEach(allTasks) { tasks in
                         HStack{
+                            Circle()
+                                .fill(styleForPriority(tasks.priority!))
+                                .frame(width: 15, height: 15)
+                            Spacer().frame(width: 20)
                             Text(tasks.title ?? "")
+                            Spacer()
+                            Image(systemName: tasks.isFavourite ? "heart.fill":"heart")
+                                .foregroundColor(.red)
+                                .onTapGesture {
+                                    updateTask(tasks)
+                                }
                         }
                     }
                     
@@ -96,6 +130,7 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        let persistantContainer = CoreDataManager.shared.persistantContainer
+        ContentView().environment(\.managedObjectContext, persistantContainer.viewContext)
     }
 }
