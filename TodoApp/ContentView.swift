@@ -7,10 +7,21 @@
 
 import SwiftUI
 
+
+enum Priority: String, Identifiable, CaseIterable
+
 struct ContentView: View {
+    
+    @State private var title:String = ""
+    
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        NavigationView {
+            VStack{
+                TextField("Enter Title", text:$title)
+            }
+            .navigationTitle("All Task")
+            
+        }
     }
 }
 
